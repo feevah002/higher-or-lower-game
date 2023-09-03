@@ -1,8 +1,9 @@
 # random integer module
-from random import randint
+import random
 from game_data import data
 import art
 import os
+
 
 def clear_screen():
     """
@@ -26,7 +27,7 @@ def get_random_celebrity():
     '''
     get random celebrities from the module
     '''
-    celebrity = data[randint(0, len(data)-1)]
+    celebrity = random.choice(data)
     return celebrity
 
 
@@ -36,7 +37,7 @@ def game_question(celebrity_one, celebrity_two):
     '''
     question_one = f"Compare A: {celebrity_one['name']}, a {celebrity_one['description']}, from {celebrity_one['country']} \n{display_vs_logo()}"
 
-    question_two = f"Compare B: {celebrity_two['name']}, a {celebrity_two['description']}, from {celebrity_two['country']}"
+    question_two = f"Against B: {celebrity_two['name']}, a {celebrity_two['description']}, from {celebrity_two['country']}"
     return question_one + question_two
 
 def check_answer(user_answer, celebrity_one, celebrity_two):
@@ -65,8 +66,12 @@ def play_game():
         compare_one = get_random_celebrity()
         compare_two = get_random_celebrity()
         # handles situation where 2 random generated celebrities are the same
-        while compare_one == compare_two:
+        # to avoid an indefinite loop
+        times_to_loop = 3
+        while compare_one == compare_two and times_to_loop > 0:
             compare_two = get_random_celebrity()
+            times_to_loop -= 1
+    
         if user_score > 0:
             # replacing celebrity with previous if user has passed a question
             compare_one = previous
@@ -82,9 +87,9 @@ def play_game():
             print('invalid choice')
         # check if user answer is correct
         if check_answer(user_answer, compare_one, compare_two):
+            clear_screen()
             user_score += 1
             print(f"You're right. Current score: {user_score}")
-            print(user_score)
             # getting the previous celebrity used
             previous = compare_two
         else:
